@@ -1,0 +1,29 @@
+# profiles.yml
+# Defines database connections for dbt
+# NOTE: In production, this lives in ~/.dbt/profiles.yml
+# For this project, we'll set DBT_PROFILES_DIR to point here
+
+salesforce_pipeline:
+  target: dev  # Default target when running dbt commands
+  outputs:
+    # Development environment - your local PostgreSQL
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: "{{ env_var('POSTGRES_USER', 'postgres') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'postgres') }}"
+      dbname: salesforce_dw
+      schema: public
+      threads: 4  # Parallel model builds
+
+    # Production would look like this (not used in this project)
+    # prod:
+    #   type: postgres
+    #   host: "{{ env_var('PROD_DB_HOST') }}"
+    #   port: 5432
+    #   user: "{{ env_var('PROD_DB_USER') }}"
+    #   password: "{{ env_var('PROD_DB_PASSWORD') }}"
+    #   dbname: salesforce_dw
+    #   schema: public
+    #   threads: 8

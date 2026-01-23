@@ -1,0 +1,20 @@
+# Data Pipeline Dependencies
+
+# Extraction & Loading
+pandas>=2.0.0
+faker>=18.0.0          # Generate realistic mock data
+psycopg2-binary>=2.9.0 # PostgreSQL adapter
+
+# dbt
+dbt-core>=1.7.0
+dbt-postgres>=1.7.0
+
+# Airflow (install separately - has many dependencies)
+# pip install apache-airflow==2.8.0
+
+# Data Quality
+great-expectations>=0.18.0
+
+# Utilities
+python-dotenv>=1.0.0   # Environment variable management
+pyyaml>=6.0.0          # Config file parsing

@@ -1,0 +1,65 @@
+# dbt_project.yml
+# This is the main configuration file for your dbt project
+
+name: 'salesforce_pipeline'
+version: '1.0.0'
+config-version: 2
+
+# Where dbt looks for models, macros, etc.
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Directory for compiled SQL and run artifacts
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+# Set up conventions that enforce consistency across the project
+models:
+  salesforce_pipeline:
+    # Staging models: materialized as views (cheap, always fresh)
+    staging:
+      +materialized: view
+      +schema: staging
+      # All staging models should have these tests
+      +tags: ['staging']
+
+    # Intermediate models: also views (they're stepping stones)
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+      +tags: ['intermediate']
+
+    # Mart models: materialized as tables (performance for consumers)
+    marts:
+      +materialized: table
+      +schema: marts
+      +tags: ['marts']
+      core:
+        +tags: ['core']
+      marketing:
+        +tags: ['marketing']
+      finance:
+        +tags: ['finance']
+
+# Seed configurations (static CSV data)
+seeds:
+  salesforce_pipeline:
+    +schema: seeds
+
+# Snapshot configurations (SCD Type 2)
+snapshots:
+  salesforce_pipeline:
+    +schema: snapshots
+
+# Variables (can be overridden at runtime)
+vars:
+  # Date range for filtering historical data
+  start_date: '2022-01-01'
+  # Fiscal year start month (February = 2)
+  fiscal_year_start_month: 2
