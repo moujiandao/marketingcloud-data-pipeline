@@ -1,0 +1,151 @@
+version: 2
+
+sources:
+  - name: salesforce
+    description: Raw Salesforce data loaded from JSON extracts
+    database: salesforce_dw
+    schema: raw
+    tables:
+      - name: users
+        description: Salesforce users (sales reps, managers)
+        columns:
+          - name: id
+            description: Salesforce User ID (primary key)
+            tests:
+              - unique
+              - not_null
+
+      - name: accounts
+        description: Companies we sell to
+        columns:
+          - name: id
+            description: Salesforce Account ID (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: owner_id
+            description: User who owns this account
+            tests:
+              - relationships:
+                  arguments:
+                    to: source('salesforce', 'users')
+                    field: id
+
+      - name: contacts
+        description: People at customer companies
+        columns:
+          - name: id
+            description: Salesforce Contact ID (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: account_id
+            description: Parent account
+            tests:
+              - relationships:
+                  arguments:
+                    to: source('salesforce', 'accounts')
+                    field: id
+
+      - name: leads
+        description: Prospects not yet qualified
+        columns:
+          - name: id
+            description: Salesforce Lead ID (primary key)
+            tests:
+              - unique
+              - not_null
+
+      - name: campaigns
+        description: Marketing campaigns
+        columns:
+          - name: id
+            description: Salesforce Campaign ID (primary key)
+            tests:
+              - unique
+              - not_null
+
+      - name: campaign_members
+        description: Junction table linking campaigns to leads/contacts
+        columns:
+          - name: id
+            description: Salesforce CampaignMember ID (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: campaign_id
+            description: Parent campaign
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('salesforce', 'campaigns')
+                    field: id
+
+      - name: products
+        description: Products we sell
+        columns:
+          - name: id
+            description: Salesforce Product ID (primary key)
+            tests:
+              - unique
+              - not_null
+
+      - name: pricebook_entries
+        description: Product pricing
+        columns:
+          - name: id
+            description: Salesforce PricebookEntry ID (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: product2_id
+            description: Related product
+            tests:
+              - relationships:
+                  arguments:
+                    to: source('salesforce', 'products')
+                    field: id
+
+      - name: opportunities
+        description: Sales deals in pipeline
+        columns:
+          - name: id
+            description: Salesforce Opportunity ID (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: account_id
+            description: Parent account
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('salesforce', 'accounts')
+                    field: id
+
+      - name: opportunity_line_items
+        description: Products on opportunities
+        columns:
+          - name: id
+            description: Salesforce OpportunityLineItem ID (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: opportunity_id
+            description: Parent opportunity
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('salesforce', 'opportunities')
+                    field: id
+
+      - name: tasks
+        description: Sales activities (calls, emails, meetings)
+        columns:
+          - name: id
+            description: Salesforce Task ID (primary key)
+            tests:
+              - unique
+              - not_null

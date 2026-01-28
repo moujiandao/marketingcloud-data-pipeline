@@ -4,6 +4,7 @@
 name: 'salesforce_pipeline'
 version: '1.0.0'
 config-version: 2
+profile: 'salesforce_pipeline'
 
 # Where dbt looks for models, macros, etc.
 model-paths: ["models"]

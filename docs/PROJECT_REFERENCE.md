@@ -1,8 +1,45 @@
 # Project Reference - Salesforce Data Pipeline
 
-**Last Updated**: 2026-01-21
+**Last Updated**: 2026-01-22 23:35
+**Current Status**: Phase 6 Complete (dbt Staging Models)
 
 This document serves as our shared context for the Salesforce data pipeline project. It captures all setup decisions, technical explanations, and project conventions established during development.
+
+---
+
+## 🎯 CURRENT STATUS (Session Context)
+
+**Completed Phases:**
+- ✅ Phase 1: Dimensional modeling & star schema
+- ✅ Phase 2: Project structure and dependencies
+- ✅ Phase 3: Mock data generation (20,576 records)
+- ✅ Phase 4: Database loading scripts
+- ✅ Phase 5: PostgreSQL setup and data loading
+- ✅ Phase 6: dbt staging models (8 views created)
+
+**Next Phase:** Phase 7 - Intermediate Models
+
+**PostgreSQL Details:**
+- Database: `salesforce_dw`
+- User: `brianmar`
+- Location: `/opt/homebrew/var/postgresql@14/`
+- Schemas: `raw`, `public_staging`, `intermediate`, `marts`
+
+**dbt Configuration:**
+- Profile: `salesforce_pipeline`
+- Profiles dir: `./dbt/profiles.yml`
+- Run command: `cd dbt && dbt run --profiles-dir .`
+- Current models: 8 staging views in `public_staging.*`
+
+**Key Files:**
+- Data generator: `src/extract/generate_mock_data.py`
+- PostgreSQL loader: `src/load/load_to_postgres.py`
+- Staging models: `dbt/models/staging/salesforce/stg_salesforce__*.sql`
+- Sources config: `dbt/models/staging/salesforce/_sources.yml`
+
+**GitHub Repo:**
+- URL: https://github.com/moujiandao/marketingcloud-data-pipeline
+- Last commit: Initial commit with staging models
 
 ---
 
@@ -440,32 +477,47 @@ cp .env.example .env
 # Set POSTGRES_USER, POSTGRES_PASSWORD, etc.
 ```
 
-### dbt Commands (to be used later)
+### dbt Commands (Currently Using)
 ```bash
-# Set dbt profiles directory
-export DBT_PROFILES_DIR=./dbt
+# Navigate to dbt directory
+cd dbt
 
 # Test database connection
-dbt debug
-
-# Install dbt packages
-dbt deps
+dbt debug --profiles-dir .
 
 # Run all models
-dbt run
+dbt run --profiles-dir .
+
+# Run only staging models
+dbt run --profiles-dir . --select staging
 
 # Run specific model
-dbt run --select dim_account
+dbt run --profiles-dir . --select stg_salesforce__accounts
 
 # Test data quality
-dbt test
+dbt test --profiles-dir .
 
 # Generate documentation
-dbt docs generate
-dbt docs serve
+dbt docs generate --profiles-dir .
+dbt docs serve --profiles-dir .
 
-# Run incrementally
-dbt run --select fct_opportunity --full-refresh
+# Compile SQL without running
+dbt compile --profiles-dir .
+
+# Show model lineage
+dbt docs generate --profiles-dir . && dbt docs serve --profiles-dir .
+```
+
+### Query Staging Models
+```bash
+# List staging views
+psql salesforce_dw -c "\dv public_staging.*"
+
+# Query a staging view
+psql salesforce_dw -c "SELECT * FROM public_staging.stg_salesforce__accounts LIMIT 5;"
+
+# Check counts
+psql salesforce_dw -c "SELECT COUNT(*) FROM public_staging.stg_salesforce__opportunities;"
 ```
 
 ---

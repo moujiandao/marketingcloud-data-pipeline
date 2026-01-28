@@ -11,8 +11,8 @@ salesforce_pipeline:
       type: postgres
       host: localhost
       port: 5432
-      user: "{{ env_var('POSTGRES_USER', 'postgres') }}"
-      password: "{{ env_var('POSTGRES_PASSWORD', 'postgres') }}"
+      user: "{{ env_var('POSTGRES_USER', 'brianmar') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', '') }}"
       dbname: salesforce_dw
       schema: public
       threads: 4  # Parallel model builds
