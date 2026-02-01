@@ -56,3 +56,4 @@ data/processed/*
 *.pem
 *.key
 credentials.json
+logs/
