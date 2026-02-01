@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: dim_campaigns
+    description: |
+      Dimension table for marketing campaigns.
+      Contains campaign attributes and performance metrics denormalized for convenience.
+      One row per campaign.
+    columns:
+      - name: campaign_id
+        description: Primary key for campaigns
+        tests:
+          - unique
+          - not_null
+      - name: campaign_name
+        description: Campaign name
+        tests:
+          - not_null
+      - name: campaign_type
+        description: Type of campaign (Email, Webinar, Conference, etc.)
+      - name: campaign_status
+        description: Current status (Planned, In Progress, Completed)
+      - name: is_active
+        description: Whether campaign is currently active
+      - name: budgeted_cost
+        description: Planned campaign budget
+      - name: actual_cost
+        description: Actual spend on campaign
+      - name: expected_revenue
+        description: Expected revenue from campaign
+      - name: total_members
+        description: Number of people in this campaign
+      - name: responded_members
+        description: Number of people who responded
+      - name: response_rate
+        description: Percentage of members who responded
+      - name: performance_category
+        description: Campaign effectiveness (High/Medium/Low Performance)
+      - name: start_date
+        description: Campaign start date
+      - name: end_date
+        description: Campaign end date
+      - name: campaign_duration_days
+        description: Length of campaign in days
+
+  - name: fct_campaign_members
+    description: |
+      Fact table for campaign membership.
+      Grain: One row per person per campaign.
+      Links contacts/leads to campaigns and tracks response behavior.
+    columns:
+      - name: campaign_member_id
+        description: Primary key for campaign members
+        tests:
+          - unique
+          - not_null
+      - name: campaign_id
+        description: Foreign key to dim_campaigns
+        tests:
+          - not_null
+      - name: contact_id
+        description: Foreign key to dim_contacts (nullable - either contact_id or lead_id)
+      - name: lead_id
+        description: Foreign key to leads (nullable - either contact_id or lead_id)
+      - name: date_key
+        description: Foreign key to dim_date (member created date)
+      - name: member_status
+        description: Campaign member status (Sent, Responded, etc.)
+      - name: responded_count
+        description: 1 if responded, 0 if not (for aggregation)
+      - name: member_count
+        description: Always 1 (for counting members)
+      - name: has_responded
+        description: Boolean flag indicating if member responded

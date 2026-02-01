@@ -1,0 +1,102 @@
+version: 2
+
+models:
+  - name: int_opportunities_enhanced
+    description: |
+      Enhanced opportunities with joined account and owner information.
+      Adds calculated fields like deal age, sales cycle, and expected revenue.
+      Used as source for fct_opportunities mart.
+    columns:
+      - name: opportunity_id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: Related account
+      - name: account_name
+        description: Company name
+      - name: owner_user_id
+        description: Sales rep who owns this deal
+      - name: owner_name
+        description: Sales rep full name
+      - name: stage_name
+        description: Current sales stage
+      - name: stage_category
+        description: Early, Middle, or Late stage
+      - name: deal_status
+        description: Won, Lost, or Open
+      - name: amount
+        description: Deal size
+      - name: expected_revenue
+        description: Amount * probability (weighted pipeline)
+      - name: deal_age_days
+        description: Days since opportunity was created
+      - name: sales_cycle_days
+        description: Days from created to close date
+
+  - name: int_contacts_enriched
+    description: |
+      Contacts with engagement metrics aggregated from tasks and opportunities.
+      Includes task completion rates, opportunity counts, and engagement scoring.
+      Used as source for dim_contacts mart.
+    columns:
+      - name: contact_id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Contact first name
+      - name: last_name
+        description: Contact last name
+      - name: email
+        description: Contact email
+      - name: account_id
+        description: Related account
+      - name: account_name
+        description: Company name
+      - name: total_tasks
+        description: Count of all sales activities
+      - name: completed_tasks
+        description: Count of completed tasks
+      - name: total_opportunities
+        description: Count of opportunities for this contact's account
+      - name: won_opportunities
+        description: Count of won opportunities
+      - name: task_completion_rate
+        description: Percentage of tasks completed
+      - name: win_rate
+        description: Percentage of opportunities won
+      - name: engagement_level
+        description: High, Medium, or Low based on activity volume
+
+  - name: int_campaign_performance
+    description: |
+      Campaigns with member metrics and performance calculations.
+      Aggregates member counts, response rates, and ROI calculations.
+      Used as source for dim_campaigns mart.
+    columns:
+      - name: campaign_id
+        description: Primary key
+        tests:
+          - unique
+          - not_null
+      - name: campaign_name
+        description: Campaign name
+      - name: campaign_type
+        description: Type of campaign
+      - name: total_members
+        description: Number of people in campaign
+      - name: responded_members
+        description: Number who responded
+      - name: response_rate
+        description: Percentage who responded
+      - name: cost_per_member
+        description: Actual cost divided by total members
+      - name: cost_per_response
+        description: Actual cost divided by responded members
+      - name: expected_roi_percent
+        description: Expected return on investment percentage
+      - name: performance_category
+        description: High/Medium/Low Performance based on response rate

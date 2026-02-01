@@ -1,0 +1,17 @@
+# dbt artifacts
+target/
+dbt_packages/
+dbt_internal_packages/
+logs/
+
+# OS files
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/

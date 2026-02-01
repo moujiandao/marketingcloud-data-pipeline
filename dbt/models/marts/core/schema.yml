@@ -1,0 +1,158 @@
+version: 2
+
+models:
+  - name: dim_accounts
+    description: |
+      Dimension table for customer accounts (companies).
+      Contains descriptive attributes about organizations we sell to.
+      One row per account.
+    columns:
+      - name: account_id
+        description: Primary key for accounts
+        tests:
+          - unique
+          - not_null
+      - name: account_name
+        description: Company name
+        tests:
+          - not_null
+      - name: industry
+        description: Industry vertical (Technology, Healthcare, etc.)
+      - name: account_type
+        description: Account classification (Customer, Prospect, Partner)
+      - name: owner_user_id
+        description: Sales rep who owns this account
+      - name: created_date
+        description: When this account was created in Salesforce
+      - name: loaded_at
+        description: When this record was loaded into the warehouse
+
+  - name: dim_contacts
+    description: |
+      Dimension table for contacts (people at customer companies).
+      Includes engagement metrics denormalized for analytical convenience.
+      One row per contact.
+    columns:
+      - name: contact_id
+        description: Primary key for contacts
+        tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Contact's first name
+      - name: last_name
+        description: Contact's last name
+        tests:
+          - not_null
+      - name: email
+        description: Contact's email address
+        tests:
+          - unique
+      - name: account_id
+        description: Foreign key to dim_accounts
+      - name: account_name
+        description: Company name (denormalized for convenience)
+      - name: total_tasks
+        description: Total number of sales activities (calls, emails, meetings)
+      - name: completed_tasks
+        description: Number of completed tasks
+      - name: total_opportunities
+        description: Number of opportunities associated with this contact's account
+      - name: won_opportunities
+        description: Number of won opportunities
+      - name: engagement_level
+        description: Categorization of engagement (High, Medium, Low)
+
+  - name: dim_products
+    description: |
+      Dimension table for products we sell.
+      Contains product catalog information.
+      One row per product.
+    columns:
+      - name: product_id
+        description: Primary key for products
+        tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: Product name
+        tests:
+          - not_null
+      - name: product_code
+        description: SKU or product code
+      - name: product_family
+        description: Product category/family grouping
+      - name: is_active
+        description: Whether this product is currently being sold
+
+  - name: dim_date
+    description: |
+      Date dimension table for time-based analysis.
+      Contains date attributes, fiscal calendar, and business day flags.
+      One row per date from 2022-01-01 through 2026-12-31.
+    columns:
+      - name: date_day
+        description: Primary key - the date value
+        tests:
+          - unique
+          - not_null
+      - name: year
+        description: Calendar year (2022-2026)
+      - name: quarter
+        description: Calendar quarter (1-4)
+      - name: month
+        description: Month number (1-12)
+      - name: month_name
+        description: Month name (January, February, etc.)
+      - name: day_of_week
+        description: Day of week (0=Sunday, 6=Saturday)
+      - name: is_weekday
+        description: True if Monday-Friday
+      - name: is_weekend
+        description: True if Saturday or Sunday
+      - name: fiscal_year
+        description: Fiscal year (starts in February based on company calendar)
+      - name: is_quarter_end
+        description: True if last day of quarter
+      - name: is_month_end
+        description: True if last day of month
+
+  - name: fct_opportunities
+    description: |
+      Fact table for sales opportunities.
+      Grain: One row per opportunity.
+      Contains foreign keys to dimensions and numeric measures for analysis.
+    columns:
+      - name: opportunity_id
+        description: Primary key for opportunities
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: Foreign key to dim_accounts
+        tests:
+          - not_null
+      - name: owner_user_id
+        description: Foreign key to sales rep who owns this opportunity
+      - name: date_key
+        description: Foreign key to dim_date (close date)
+      - name: opportunity_name
+        description: Deal name
+      - name: stage_name
+        description: Current sales stage
+      - name: stage_category
+        description: Rollup of stage (Early, Middle, Late)
+      - name: deal_status
+        description: Won, Lost, or Open
+      - name: amount
+        description: Deal size in dollars
+        tests:
+          - not_null
+      - name: probability
+        description: Win probability percentage (0-100)
+      - name: expected_revenue
+        description: Amount weighted by probability
+      - name: is_closed
+        description: True if opportunity is closed (won or lost)
+      - name: is_won
+        description: True if opportunity was won
